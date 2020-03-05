@@ -4,4 +4,4 @@ mat = scipy.io.loadmat('Reference_data.mat') # this creates a dictionary with th
 
 #print(mat.keys())
 Flight_Data = mat["flightdata"] #numpy.ndarray
-print(Flight_Data)
+print(Flight_Data[0])
