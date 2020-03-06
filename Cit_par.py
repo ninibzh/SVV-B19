@@ -1,4 +1,5 @@
 from math import *
+import numpy as np
 # Citation 550 - Linear simulation
 
 # xcg = 0.25 * c
@@ -109,3 +110,52 @@ Cnp    =  -0.0602
 Cnr    =  -0.2061
 Cnda   =  -0.0120
 Cndr   =  -0.0939
+
+
+#Symmetric
+
+C1 = np.array([[-2*muc*c, 0, 0, 0],
+      [0, (CZa-2*muc)*c/V0, 0, 0],
+      [0, 0, -c/V0, 0],
+      [0, Cmadot*c/V0, 0, -2*muc*KY2]])
+C2 = np.array([[CXu*V0, CXa, CZ0, CXq*V0/c],
+      [CZu*V0, CZa, -CX0, V0/c*(CZq+2*muc)],
+      [0, 0, 0, V0/c],
+      [Cmu*V0, Cma, 0, Cmq*V0/c]])
+C3 = np.array([[CXde], [CZde], [0], [Cmde]])
+
+
+A = (-np.linalg.inv(C1)).dot(C2)
+B = (-np.linalg.inv(C1)).dot(C3)
+C = np.array([[1, 0, 0, 0],
+              [0, 1, 0, 0],
+              [0, 0, 1, 0],
+              [0, 0, 0, 1]])
+D = np.array([[0], [0], [0], [0]])
+
+
+
+
+#A-Symmetric (_a)
+
+C1_a = np.array([[(CYbdot-2*mub)*b/V0, 0, 0, 0],
+               [0, -0.5*b/V0, 0, 0],
+               [0, 0, -8*mub*KX2, 8*mub*KXZ],
+               [Cnbdot*b/V, 0, 8*mub*KXZ, -8*mub*KZ2]])
+C2_a = np.array([[CYb, CL, CYp*2V0/b, (CYr-4*mub)*2*V0/b],
+               [0, 0, (1-2*V0/b), 0],
+               [Clb, 0, Clp*2*V0/b, Clr*2*V0/b],
+               [Cnb, 0, Cnp*2*V0/b, Cnr*2*V0/b]])
+C3_a = np.array([[CYda, CYdr],
+               [0, 0],
+               [Clda, Cldr],
+               [Cnda, Cndr]])
+
+A_a = (-np.linalg.inv(C1_a)).dot(C2_a)
+B_a = (-np.linalg.inv(C1_a)).dot(C3_a)
+C_a = np.array([[1, 0, 0, 0],
+              [0, 1, 0, 0],
+              [0, 0, 1, 0],
+              [0, 0, 0, 1]])
+D_a = np.array([[0, 0], [0, 0], [0, 0], [0, 0]])
+
