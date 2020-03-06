@@ -8,13 +8,13 @@ import matplotlib.pyplot as plt
 
 # Stationary flight condition
 
-hp0    =    1   	      # pressure altitude in the stationary flight condition [m]
-V0     =   1          # true airspeed in the stationary flight condition [m/sec]
-alpha0 =    1         # angle of attack in the stationary flight condition [rad]
-th0    =   1          # pitch angle in the stationary flight condition [rad]
+hp0    =    1000   	      # pressure altitude in the stationary flight condition [m]
+V0     =   100.11566510739169          # true airspeed in the stationary flight condition [m/sec]
+alpha0 =    1.3396058378128493 *np.pi/180        # angle of attack in the stationary flight condition [rad]
+th0    =   1.3348388671815015 *np.pi/180        # pitch angle in the stationary flight condition [rad]
 
 # Aircraft mass
-m      =    1         # mass [kg]
+m      =    4899         # mass [kg]
 
 # aerodynamic properties
 e      =   0.8          # Oswald factor [ ]
@@ -37,7 +37,7 @@ b      = 15.911	          # wing span [m]
 bh     = 5.791	          # stabilser span [m]
 A      = b ** 2 / S      # wing aspect ratio [ ]
 Ah     = bh ** 2 / Sh    # stabilser aspect ratio [ ]
-Vh_V   = 1	          # [ ]
+Vh_V   = 100.11566510739169 	          # [ ]
 ih     = -2 * pi / 180   # stabiliser angle of incidence [rad]
 
 # Constant values concerning atmosphere and gravity
@@ -125,7 +125,7 @@ C2 = np.array([[CXu*V0, CXa, CZ0, CXq*V0/c],
       [0, 0, 0, V0/c],
       [Cmu*V0, Cma, 0, Cmq*V0/c]])
 C3 = np.array([[CXde], [CZde], [0], [Cmde]])
-
+C_extra=C2+C1
 
 A = (-np.linalg.inv(C1)).dot(C2)
 B = (-np.linalg.inv(C1)).dot(C3)
@@ -133,9 +133,10 @@ C = np.array([[1, 0, 0, 0],
               [0, 1, 0, 0],
               [0, 0, 1, 0],
               [0, 0, 0, 1]])
-D = np.array([[0], [0], [0], [0]])
+D = (np.linalg.inv(C_extra)).dot(C3)
+print(D)
 
-
+sys=ss(A,B,C,D)
 
 
 #A-Symmetric (_a)
@@ -153,28 +154,43 @@ C3_a = np.array([[CYda, CYdr],
                [Clda, Cldr],
                [Cnda, Cndr]])
 
+C_extra_a=C2_a+C1_a
+
+
 A_a = (-np.linalg.inv(C1_a)).dot(C2_a)
 B_a = (-np.linalg.inv(C1_a)).dot(C3_a)
 C_a = np.array([[1, 0, 0, 0],
               [0, 1, 0, 0],
               [0, 0, 1, 0],
               [0, 0, 0, 1]])
-D_a = np.array([[0, 0], [0, 0], [0, 0], [0, 0]])
-
-
-#Creating a system
-sys = ss(A, B, C, D)
-
+D_a =(np.linalg.inv(C_extra_a)).dot(C3)
 
 
 #Response for symmetric flight
-x0=np.matrix([[V0],[alpha0], [th0], [0]]) 
+x0=np.matrix([[V0],[alpha0], [th0], [0.05]]) 
 t=np.arange(0.0,100.01,0.01) 
 
-y1=initial(sys,t,x0)  #velocity response
+#Defining inputs
+w1=1
+w2=2
+u1 = np.sin(t*w1) 
+u2 = np.sin(t*w2)
 
-plt.plot(t,y1[0]) 
+y1=initial(sys,t,x0)  
+
+speed=[]
+print(len(t))
+print(len(y1[0]))
+
+for i in range(len(y1[0])):
+    speed.append(y1[0][i][0])
+    
+y1,tdum,xdum=lsim(sys,U=u1,T=t) 
+y2,tdum,xdum=lsim(sys,U=u2,T=t)
+plt.plot(t,speed)
 plt.show()
+plt.plot(t,y1,t,y2)
+plt.plot()
 
 
 
