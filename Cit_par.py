@@ -1,5 +1,7 @@
 from math import *
 import numpy as np
+from control.matlab import *
+import matplotlib.pyplot as plt
 # Citation 550 - Linear simulation
 
 # xcg = 0.25 * c
@@ -141,8 +143,8 @@ D = np.array([[0], [0], [0], [0]])
 C1_a = np.array([[(CYbdot-2*mub)*b/V0, 0, 0, 0],
                [0, -0.5*b/V0, 0, 0],
                [0, 0, -8*mub*KX2, 8*mub*KXZ],
-               [Cnbdot*b/V, 0, 8*mub*KXZ, -8*mub*KZ2]])
-C2_a = np.array([[CYb, CL, CYp*2V0/b, (CYr-4*mub)*2*V0/b],
+               [Cnbdot*b/V0, 0, 8*mub*KXZ, -8*mub*KZ2]])
+C2_a = np.array([[CYb, CL, CYp*2*V0/b, (CYr-4*mub)*2*V0/b],
                [0, 0, (1-2*V0/b), 0],
                [Clb, 0, Clp*2*V0/b, Clr*2*V0/b],
                [Cnb, 0, Cnp*2*V0/b, Cnr*2*V0/b]])
@@ -158,4 +160,27 @@ C_a = np.array([[1, 0, 0, 0],
               [0, 0, 1, 0],
               [0, 0, 0, 1]])
 D_a = np.array([[0, 0], [0, 0], [0, 0], [0, 0]])
+
+
+#Creating a system
+sys = ss(A, B, C, D)
+
+
+
+#Response for symmetric flight
+x0=np.matrix([[V0],[alpha0], [th0], [0]]) 
+t=np.arange(0.0,100.01,0.01) 
+
+y1=initial(sys,t,x0)  #velocity response
+
+plt.plot(t,y1[0]) 
+plt.show()
+
+
+
+
+
+
+
+
 
