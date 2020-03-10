@@ -73,24 +73,23 @@ def get_iv(lst1,lst2,lst3,index,index_end):
         
     return inputs_da,inputs_de,inputs_dr
 
-#getting the kets
-print(reference_data.keys())
-print(reference_data["flightdata"].keys())
-#print()
 
-test_list_tas = reference_data["flightdata"]["Dadc1_tas"]["data"]
-test_list_alt=reference_data["flightdata"]["Dadc1_alt"]["data"]
-theta_list=reference_data["flightdata"]["Ahrs1_Pitch"]["data"]
-angle_of_attack_list=reference_data["flightdata"]["vane_AOA"]["data"]
+def get_lists(tas,alt,pitch,AOA,d_a,d_r,d_e,t):
+    
+    test_list_tas = reference_data["flightdata"][str(tas)]["data"]
+    test_list_alt=reference_data["flightdata"][str(alt)]["data"]
+    theta_list=reference_data["flightdata"][str(pitch)]["data"]
+    angle_of_attack_list=reference_data["flightdata"][str(AOA)]["data"]
 
-delta_a=reference_data["flightdata"]["delta_a"]["data"]
-delta_r=reference_data["flightdata"]["delta_r"]["data"]
-delta_e=reference_data["flightdata"]["delta_e"]["data"]
+    delta_a=reference_data["flightdata"][str(d_a)]["data"]
+    delta_r=reference_data["flightdata"][str(d_r)]["data"]
+    delta_e=reference_data["flightdata"][str(d_e)]["data"]
 
-t=reference_data["flightdata"]["time"]["data"]
+    t=reference_data["flightdata"][str(t)]["data"]
 
-plt.plot(t, angle_of_attack_list)
-plt.show()
+    return test_list_tas, test_list_alt, theta_list, angle_of_attack_list, delta_a, delta_r, delta_e
+
+
 
 
 def get_Phugoid(test_list_tas, test_list_alt, theta_list, angle_of_attack_list, t, start_hour, start_min, start_sec, end_hour, end_min, end_sec): #Phugoid motion
@@ -110,12 +109,11 @@ def get_DR(test_list_tas, test_list_alt, theta_list, angle_of_attack_list, t, st
 
 
 def get_DR(test_list_tas, test_list_alt, theta_list, angle_of_attack_list, t, start_hour, start_min, start_sec, end_hour, end_min, end_sec): #Short Period motion
-
-index=get_value(start_hour,start_min,start_sec) #1,0,35
-index_end=get_value(end_hour,end_min,end_sec) #1,1,28
-SP_tas, SP_alt, SP_theta, SP_aoa, SP_time =get_kv(test_list_tas, test_list_alt,theta_list, angle_of_attack_list,t,index)
-SP_inputs_da, SP_inputs_de, SP_inputs_dr=get_iv(delta_a, delta_e, delta_r, index, index_end)
-
+    index=get_value(start_hour,start_min,start_sec) #1,0,35
+    index_end=get_value(end_hour,end_min,end_sec) #1,1,28
+    SP_tas, SP_alt, SP_theta, SP_aoa, SP_time =get_kv(test_list_tas, test_list_alt,theta_list, angle_of_attack_list,t,index)
+    SP_inputs_da, SP_inputs_de, SP_inputs_dr=get_iv(delta_a, delta_e, delta_r, index, index_end)
+    return Phugoid_tas, Phugoid_alt, Phugoid_theta, Phugoid_aoa, Phugoid_time, Phugoid_inputs_da, Phugoid_inputs_de, Phugoid_inputs_dr
 
 
 def get_mass(hours,minu,sec):
@@ -134,7 +132,6 @@ def get_mass(hours,minu,sec):
             Vel =  reference_data["flightdata"]["Dadc1_tas"]["data"][j] *0.51444
             Fuel_out_weight = (reference_data["flightdata"]["lh_engine_FU"]["data"][j] +  reference_data["flightdata"]["rh_engine_FU"]["data"][j])*0.453592
             Aircraft_weight = TOW - Fuel_out_weight
-
     return Aircraft_weight 
 
 #print(Phugoid_tas, Phugoid_alt, Phugoid_theta, Phugoid_aoa,Phugoid_time, get_mass(0,53,57))
