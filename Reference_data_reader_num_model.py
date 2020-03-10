@@ -43,7 +43,9 @@ def _todict(matobj):
     return dict
 
 #AC data
-reference_data = loadmat('Reference_data.mat')
+def get_rf(filename):
+    reference_data = loadmat('Reference_data.mat')
+    return reference_data
 '''
 The mat file structure has 48 options. Each option is a parameter that is measured. Each option is split up into three options: units, data
 and description. When selecting data one should adhere this format:
@@ -75,6 +77,7 @@ def get_iv(lst1,lst2,lst3,index,index_end):
 print(reference_data.keys())
 print(reference_data["flightdata"].keys())
 #print()
+
 test_list_tas = reference_data["flightdata"]["Dadc1_tas"]["data"]
 test_list_alt=reference_data["flightdata"]["Dadc1_alt"]["data"]
 theta_list=reference_data["flightdata"]["Ahrs1_Pitch"]["data"]
@@ -90,21 +93,26 @@ plt.plot(t, angle_of_attack_list)
 plt.show()
 
 
-#Phugoid
-index=get_value(0,53,57) 
-index_end=get_value(0,58,0)
-Phugoid_tas, Phugoid_alt, Phugoid_theta, Phugoid_aoa, Phugoid_time =get_kv(test_list_tas, test_list_alt,theta_list, angle_of_attack_list,t,index)
-Phugoid_inputs_da, Phugoid_inputs_de, Phugoid_inputs_dr=get_iv(delta_a, delta_e, delta_r, index, index_end)
+def get_Phugoid(test_list_tas, test_list_alt, theta_list, angle_of_attack_list, t, start_hour, start_min, start_sec, end_hour, end_min, end_sec): #Phugoid motion
+    index=get_value(start_hour,start_min,start_sec) #0,53,57
+    index_end=get_value(end_hour,end_min,end_sec) #0,58,0
+    Phugoid_tas, Phugoid_alt, Phugoid_theta, Phugoid_aoa, Phugoid_time =get_kv(test_list_tas, test_list_alt,theta_list, angle_of_attack_list,t,index)
+    Phugoid_inputs_da, Phugoid_inputs_de, Phugoid_inputs_dr=get_iv(delta_a, delta_e, delta_r, index, index_end)
+    return Phugoid_tas, Phugoid_alt, Phugoid_theta, Phugoid_aoa, Phugoid_time, Phugoid_inputs_da, Phugoid_inputs_de, Phugoid_inputs_dr
 
-#Dutch Roll
-index=get_value(1,1,57)
-index_end=get_value(1,2,18)
-DR_tas, DR_alt, DR_theta, DR_aoa, DR_time =get_kv(test_list_tas, test_list_alt,theta_list, angle_of_attack_list, t, index)
-DR_inputs_da, DR_inputs_de, DR_inputs_dr=get_iv(delta_a, delta_e, delta_r, index, index_end)
 
-#Short Period
-index=get_value(1,0,35) 
-index_end=get_value(1,1,28)
+def get_DR(test_list_tas, test_list_alt, theta_list, angle_of_attack_list, t, start_hour, start_min, start_sec, end_hour, end_min, end_sec): #Dutch Roll motion
+    index=get_value(start_hour,start_min,start_sec) #1,1,57
+    index_end=get_value(end_hour,end_min,end_sec) #1,2,18
+    DR_tas, DR_alt, DR_theta, DR_aoa, DR_time =get_kv(test_list_tas, test_list_alt,theta_list, angle_of_attack_list, t, index)
+    DR_inputs_da, DR_inputs_de, DR_inputs_dr=get_iv(delta_a, delta_e, delta_r, index, index_end)
+    return Phugoid_tas, Phugoid_alt, Phugoid_theta, Phugoid_aoa, Phugoid_time, Phugoid_inputs_da, Phugoid_inputs_de, Phugoid_inputs_dr
+
+
+def get_DR(test_list_tas, test_list_alt, theta_list, angle_of_attack_list, t, start_hour, start_min, start_sec, end_hour, end_min, end_sec): #Short Period motion
+
+index=get_value(start_hour,start_min,start_sec) #1,0,35
+index_end=get_value(end_hour,end_min,end_sec) #1,1,28
 SP_tas, SP_alt, SP_theta, SP_aoa, SP_time =get_kv(test_list_tas, test_list_alt,theta_list, angle_of_attack_list,t,index)
 SP_inputs_da, SP_inputs_de, SP_inputs_dr=get_iv(delta_a, delta_e, delta_r, index, index_end)
 
@@ -134,6 +142,8 @@ def get_mass(hours,minu,sec):
 #print(SP_tas, SP_alt, SP_theta, SP_aoa, SP_time, get_mass(1,0,35))
 
 print(Phugoid_inputs_da, Phugoid_inputs_de, Phugoid_inputs_dr)
+
+
 
 
 
